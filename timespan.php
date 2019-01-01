@@ -11,22 +11,13 @@
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  */
-if (!is_file(__DIR__ . '/config.php')) {
-    die("Could not find the configuration file.");
-}
 
-$config = require 'config.php';
+defined('T3FX_ROOT') or define('T3FX_ROOT', __DIR__);
+
 $loader = require __DIR__ . '/vendor/autoload.php';
 
-// Create a set of Hawk credentials
-$credentials = new Dflydev\Hawk\Credentials\Credentials(
-    $config['key'],
-    $config['algorithm'],
-    $config['id']
-);
 
-/** @var \Dflydev\Hawk\Client\Client $client */
-$client = Dflydev\Hawk\Client\ClientBuilder::create()->build();
+
 $data   = array(
     'skip'   => '0',
     'limit'  => '10',
