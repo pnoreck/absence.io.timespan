@@ -24,18 +24,15 @@ class Users extends AbstractApi
 
     public function getUsers()
     {
-        $data = array(
-            'skip'   => '0',
-            'limit'  => '10',
-            'filter' => [],
+        $users = $this->postRequest(
+            'users',
+            [
+                'skip'   => '0',
+                'limit'  => '10',
+                'filter' => [],
+            ]
         );
 
-        /** @var ApiAuthenticator $api */
-        $api     = ApiAuthenticator::getInstance();
-        $request = $api->createRequest(
-            $this->getApiUrl('users'),
-
-        );
-
+        var_dump($users);
     }
 }

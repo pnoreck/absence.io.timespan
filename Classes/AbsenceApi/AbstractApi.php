@@ -14,6 +14,8 @@
 
 namespace T3fx\AbsenceApi;
 
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * Class AbstractApi
  *
@@ -34,7 +36,7 @@ class AbstractApi
      *
      * @return string
      */
-    public function getApiUrl(string $request)
+    protected function getApiUrl(string $request)
     {
         return static::API_URL . trim($request, '/');
     }
@@ -44,7 +46,7 @@ class AbstractApi
      *
      * @return \GuzzleHttp\Client
      */
-    public function getHttpClient()
+    protected function getHttpClient()
     {
         /** @var \GuzzleHttp\Client $httpClient */
         return new \GuzzleHttp\Client(
@@ -53,5 +55,59 @@ class AbstractApi
                 'timeout'  => 2.0,
             ]
         );
+    }
+
+    /**
+     * Validate the the guzzle response
+     *
+     * @param ResponseInterface $response
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function validateResponse(ResponseInterface $response)
+    {
+        if ($response->getStatusCode() != 200) {
+            throw new \Exception('Server responded with code ' . $response->getStatusCode());
+        }
+
+        var_dump($response->getHeader('content-type'));
+        var_dump(json_decode($response->getBody()));
+
+    }
+
+    /**
+     * Do a post request
+     *
+     * @param string $action
+     * @param array  $data
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function postRequest(string $action, array $data)
+    {
+        /** @var ApiAuthenticator $api */
+        $api     = ApiAuthenticator::getInstance();
+        $request = $api->createRequest(
+            $this->getApiUrl($action),
+            'POST',
+            $data
+        );
+        $options = [
+            'headers'     => [
+                'content_type'                  => 'text/plain',
+                $request->header()->fieldName() => $request->header()->fieldValue(),
+            ],
+            'form_params' => $data
+        ];
+
+        /** @var ResponseInterface $response */
+        $response = $this->getHttpClient()->post(
+            $action,
+            $options
+        );
+
+        return $this->validateResponse($response);
     }
 }
