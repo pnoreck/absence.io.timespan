@@ -27,34 +27,44 @@ $credentials = new Dflydev\Hawk\Credentials\Credentials(
 
 /** @var \Dflydev\Hawk\Client\Client $client */
 $client = Dflydev\Hawk\Client\ClientBuilder::create()->build();
+$data   = array(
+    'skip'   => '0',
+    'limit'  => '10',
+    'filter' => [],
+);
 
 /** @var \Dflydev\Hawk\Client\Request $request */
 $request = $client->createRequest(
     $credentials,
     'https://app.absence.io/api/v2/users',
-    'GET',
-    array(
-        'skip'   => '0',
-        'limit'  => '10',
-        'filter' => [],
-    )
+    'POST',
+    $data
 );
 
-$header = new \Dflydev\Hawk\Header\Header(
-    'HTTP',
-    'GET'
+$options = [
+    'headers'     => [
+        'content_type'                  => 'text/plain',
+        $request->header()->fieldName() => $request->header()->fieldValue(),
+    ],
+    'form_params' => $data
+];
+
+/** @var \GuzzleHttp\Client $httpClient */
+$httpClient = new \GuzzleHttp\Client(
+    [
+        'base_uri' => 'https://app.absence.io/api/v2/',
+        'timeout'  => 2.0,
+    ]
 );
 
-$result = $client->authenticate(
-    $credentials,
-    $request,
-    $header,
-    array(
-        'skip'   => '0',
-        'limit'  => '10',
-        'filter' => [],
-    )
+$res = $httpClient->post(
+    'users',
+    $options
 );
 
+var_dump($res->getStatusCode());
 
-var_dump($result);
+if ($res->getStatusCode() == 200) {
+    var_dump($res->getHeader('content-type'));
+    var_dump(json_decode($res->getBody()));
+}
