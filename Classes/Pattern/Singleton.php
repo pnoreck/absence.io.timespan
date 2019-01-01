@@ -12,7 +12,7 @@
  * LICENSE.txt file that was distributed with this source code.
  */
 
-namespace T3fx\Library\Pattern;
+namespace T3fx\Pattern;
 
 abstract class Singleton
 {

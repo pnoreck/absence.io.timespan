@@ -85,7 +85,7 @@ class AbstractApi
      * @return mixed
      * @throws \Exception
      */
-    public function postRequest(string $action, array $data)
+    protected function postRequest(string $action, array $data)
     {
         /** @var ApiAuthenticator $api */
         $api     = ApiAuthenticator::getInstance();

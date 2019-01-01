@@ -17,7 +17,7 @@ namespace T3fx\AbsenceApi;
 use Dflydev\Hawk\Client\Client;
 use Dflydev\Hawk\Client\ClientBuilder;
 use Dflydev\Hawk\Credentials\Credentials;
-use T3fx\Library\Pattern\Singleton;
+use T3fx\Pattern\Singleton;
 
 /**
  * Class ApiAuthenticator
