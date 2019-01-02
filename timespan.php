@@ -17,5 +17,30 @@ defined('T3FX_ROOT') or define('T3FX_ROOT', __DIR__);
 $loader = require __DIR__ . '/vendor/autoload.php';
 $loader->addPsr4('T3fx\\', __DIR__ . '/Classes');
 
-$users = new T3fx\AbsenceApi\Users();
-$users->getUsers();
+$userApi = new T3fx\AbsenceApi\Users();
+$users   = $userApi->getUsers();
+
+if (isset($argv[1]) &&
+    filter_var($argv[1], FILTER_VALIDATE_EMAIL) &&
+    isset($users[$argv[1]])
+) {
+    $currentUserId = $users[$argv[1]];
+    $timespans     = $userApi->getTimespans($currentUserId);
+    foreach ($timespans["data"] as $timespan) {
+        if ($timespan["end"] === null) {
+            $datetime = new \DateTime();
+            $end      = $datetime->format(\DateTime::ATOM);
+            $userApi->updateTimespan(
+                $timespan["_id"],
+                [
+                    'start'        => $timespan["start"],
+                    'timezoneName' => $timespan["timezoneName"],
+                    'timezone'     => $timespan["timezone"],
+                    'end'          => $end,
+                ]
+            );
+        }
+    }
+    var_dump($timespans);
+    $userApi->createTimespan($currentUserId, time());
+}

@@ -67,13 +67,18 @@ class AbstractApi
      */
     protected function validateResponse(ResponseInterface $response)
     {
-        if ($response->getStatusCode() != 200) {
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
             throw new \Exception('Server responded with code ' . $response->getStatusCode());
         }
 
-        var_dump($response->getHeader('content-type'));
-        var_dump(json_decode($response->getBody()));
+        $contentType = $response->getHeader('content-type');
+        $contentType = (is_array($contentType)) ? reset($contentType) : $contentType;
 
+        if (strpos($contentType, 'json') !== false) {
+            return json_decode($response->getBody(), true);
+        }
+
+        return $response->getBody();
     }
 
     /**
@@ -96,6 +101,43 @@ class AbstractApi
         );
         $options = [
             'headers'     => [
+                'content_type'                  => 'application/json',
+                $request->header()->fieldName() => $request->header()->fieldValue(),
+            ],
+            'form_params' => $data
+        ];
+
+        var_dump($data);
+
+        /** @var ResponseInterface $response */
+        $response = $this->getHttpClient()->post(
+            $action,
+            $options
+        );
+
+        return $this->validateResponse($response);
+    }
+
+    /**
+     * Do a put request
+     *
+     * @param string $action
+     * @param array  $data
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function putRequest(string $action, array $data)
+    {
+        /** @var ApiAuthenticator $api */
+        $api     = ApiAuthenticator::getInstance();
+        $request = $api->createRequest(
+            $this->getApiUrl($action),
+            'PUT',
+            $data
+        );
+        $options = [
+            'headers'     => [
                 'content_type'                  => 'text/plain',
                 $request->header()->fieldName() => $request->header()->fieldValue(),
             ],
@@ -103,7 +145,7 @@ class AbstractApi
         ];
 
         /** @var ResponseInterface $response */
-        $response = $this->getHttpClient()->post(
+        $response = $this->getHttpClient()->put(
             $action,
             $options
         );
