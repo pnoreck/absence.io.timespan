@@ -107,8 +107,6 @@ class AbstractApi
             'form_params' => $data
         ];
 
-        var_dump($data);
-
         /** @var ResponseInterface $response */
         $response = $this->getHttpClient()->post(
             $action,

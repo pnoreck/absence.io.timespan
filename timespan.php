@@ -26,21 +26,25 @@ if (isset($argv[1]) &&
 ) {
     $currentUserId = $users[$argv[1]];
     $timespans     = $userApi->getTimespans($currentUserId);
+    $start         = true;
     foreach ($timespans["data"] as $timespan) {
         if ($timespan["end"] === null) {
             $datetime = new \DateTime();
-            $end      = $datetime->format(\DateTime::ATOM);
+            $end      = $datetime->format(\DateTime::ISO8601);
+            $datetime->setTimestamp(time() - 60);
             $userApi->updateTimespan(
                 $timespan["_id"],
                 [
-                    'start'        => $timespan["start"],
                     'timezoneName' => $timespan["timezoneName"],
                     'timezone'     => $timespan["timezone"],
                     'end'          => $end,
                 ]
             );
+            $start = false;
         }
     }
-    var_dump($timespans);
-    $userApi->createTimespan($currentUserId, time());
+
+    if ($start) {
+        $userApi->createTimespan($currentUserId, time());
+    }
 }

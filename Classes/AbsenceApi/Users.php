@@ -128,13 +128,12 @@ class Users extends AbstractApi
             );
 
         $datetime = new \DateTime();
-        $datetime->setTimestamp($start);
-        $start   = $datetime->format(\DateTime::ATOM);
+        $datetime->setTimestamp($start - 60);
+        $start   = $datetime->format(\DateTime::ISO8601);
         $options = [
             "userId"       => $userId,
-            // "start"        => $start,
-            "start"        => "2019-01-01T10:12:09.428Z",
-            "end"          => "2019-01-01T10:12:15.287Z",
+            "start"        => $start,
+            // "end"          => NULL,
             "timezoneName" => "CET",
             "timezone"     => "+0100",
             "type"         => "work"
