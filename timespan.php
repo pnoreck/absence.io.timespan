@@ -41,10 +41,13 @@ if (isset($argv[1]) &&
                 ]
             );
             $start = false;
+            echo 'Timespan stopped.' . PHP_EOL;
         }
     }
 
     if ($start) {
-        $userApi->createTimespan($currentUserId, time());
+        if ($userApi->createTimespan($currentUserId, time())) {
+            echo 'Timespan started.' . PHP_EOL;
+        }
     }
 }
